@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE overlay SYSTEM "chrome://fff/locale/overlay.dtd">
+<overlay id="FFF-overlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+<script src="overlay.js"/>
+<keyset>
+<key id="sample-key" modifiers="alt" key="G" oncommand="keylog.present_log()"/>
+</keyset>
+</overlay>
