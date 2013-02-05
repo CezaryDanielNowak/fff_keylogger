@@ -97,12 +97,9 @@ keylog.present_log=function() {
 	var str= sInputStream.read(sInputStream.available());
 
 	//writing the log file to a designed HTML file
-	var len=String(str).length;
-	var tmp_str='<!DOCTYPE html><html><head><meta charset="utf-8" /></head><body style="font-family:monospace">' + "\n";
-	var charrr = '';
-	var charrrAfter = '';
+	var tmp_str='<!DOCTYPE html><html><head><meta charset="utf-8"><style>span {border:1px solid #bbb;border-radius:3px;letter-spacing:-1px;margin-right:1px;padding:0 2px;} span span {border:none;padding:0;margin:0}</style></head><body style="font-family:monospace;line-height:20px;font-size:13px">' + "\n";
 
-	for(var y=0,begin_segment=0;y<len; y++)
+	for(var y=0, begin_segment=0, len=String(str).length, charrr='', charrrAfter=''; y<len; y++)
 	{
 	 if(str.substring(y,y+1)=='|')
 	 {
@@ -110,17 +107,17 @@ keylog.present_log=function() {
 	  charrr = str.substring(begin_segment,y);
 	  if(!isNumber(charrr))
 	  {
-		tmp_str+='<span style="color:green">&lt;' + charrr;
-		charrrAfter='></span>';
+		tmp_str+='<span style="color:green">' + charrr;
+		charrrAfter='</span>';
 	  }
 	  else
 	  {
 		  if(charrr == 13)
 			tmp_str+="<br>\n";
 		  else if(charrr == 8)
-			tmp_str+='<span style="color:red">[BS]</span>';
+			tmp_str+='<span style="color:red">BS</span>';
 		  else if(charrr == 0)
-			tmp_str+='<span style="color:gray">[tab]</span>';
+			tmp_str+='<span style="color:gray">tab</span>';
 		  else
 			tmp_str+='&#' + charrr + ';';
 
