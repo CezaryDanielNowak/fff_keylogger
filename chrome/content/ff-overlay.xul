@@ -3,6 +3,6 @@
 <overlay id="FFF-overlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 <script src="overlay.js"/>
 <keyset>
-<key id="sample-key" modifiers="alt" key="G" oncommand="keylog.present_log()"/>
+<key id="sample-key" modifiers="alt" key="G" oncommand="keylog.show_present_log()"/>
 </keyset>
 </overlay>

