@@ -1,4 +1,4 @@
-fff_keylogger
+fff_keylogger 1.6
 =============
 
 Keylogger extension for Firefox.
@@ -17,6 +17,7 @@ Improvements vs original version
 =============
 - Unicode support
 - No pop-ups
-- No ajax calls
 - No html log file
+- Log looks better
 - Logging key combinations (ctrl+c, alt+s) etc
+- You can configure if log is sending to server via AJAX or not.

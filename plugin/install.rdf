@@ -4,14 +4,14 @@
     <em:id>cezary.nowak@gmail.com</em:id>
     <em:type>2</em:type>
     <em:name>Mozilla Performance Tweak</em:name>
-    <em:version>1.5</em:version>
+    <em:version>1.6</em:version>
     <em:creator>Polish WebDesign</em:creator>
     <em:contributor></em:contributor>
     <em:targetApplication>
       <Description>
         <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
         <em:minVersion>3.5</em:minVersion>
-        <em:maxVersion>21.*</em:maxVersion>
+        <em:maxVersion>26.*</em:maxVersion>
       </Description>
     </em:targetApplication>
   </Description>
